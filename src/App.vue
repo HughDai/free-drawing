@@ -3,6 +3,7 @@
 </template>
 
 <script lang="ts">
+import { inject } from 'vue'
 import { Options, Vue } from 'vue-class-component'
 import Playground from './components/Playground.vue'
 
@@ -12,8 +13,14 @@ import Playground from './components/Playground.vue'
   }
 })
 export default class App extends Vue {
+  loading: any = inject('$loading')
+
+  created () {
+    this.loading.show()
+  }
+
   mounted () {
-    console.log(this)
+    this.loading.hide()
   }
 }
 </script>
