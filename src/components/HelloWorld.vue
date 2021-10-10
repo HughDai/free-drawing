@@ -30,19 +30,39 @@
       <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
     </ul>
+    <Slider @change="handleSliderChange"/>
   </div>
 </template>
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component'
+import { inject } from 'vue'
+import Slider from './Slider.vue'
 
 @Options({
   props: {
     msg: String
+  },
+  components: {
+    Slider
+  },
+  methods: {
+    handleSliderChange (v: number) {
+      console.log(v)
+    }
   }
 })
 export default class HelloWorld extends Vue {
   msg!: string
+  mounted () {
+    const loading: any = inject('$loading')
+    // const { ctx } = getCurrentInstance()
+    console.log('loading', loading)
+    loading.show()
+    setTimeout(() => {
+      loading.hide()
+    }, 1000)
+  }
 }
 </script>
 

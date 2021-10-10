@@ -1,0 +1,149 @@
+@charset "utf-8";
+html{
+    font-weight: normal;
+    background-color:#fff;
+    height: 100%;
+}
+
+body,ul,ol,li,dl,dd,h1,h2,h3,h4,h5,h6,figure,form,fieldset,legend,input,textarea,button,p,blockquote,th,td,pre,xmp{margin:0;padding:0;}
+body,input,textarea,button,select,pre,tt,code,kbd,samp,optgroup,option{font: 12px/1.5 PingFang SC,tahoma,arial,"Hiragino Sans GB","Microsoft YaHei","微软雅黑",sans-serif ,Arial,Verdana,"宋体";}
+::-webkit-input-placeholder{color:#c7ced4}
+:-moz-placeholder{color:#c7ced4}
+::-moz-placeholder{color:#c7ced4}
+:-ms-input-placeholder{color:#c7ced4}
+input[type="text"]{color:#333}
+input.error{box-shadow:0 0 2px #ff4500}
+table{border-collapse:collapse;border-spacing:0;text-align:left}
+caption,th{text-align:inherit}
+ul,ol,li,menu{list-style:none}
+fieldset,img{border:0 none}
+img,object,input,textarea,button,select{vertical-align:top}
+article,aside,footer,header,section,nav,figure,figcaption,hgroup,details,menu{display:block}
+audio,canvas,video{display:block;*display:inline;*zoom:1}
+h1,h2,h3,h4,h5,h6,input,textarea,button,select,small{font-size:100%}
+address,cite,dfn,em,i,optgroup,var{font-style:normal}
+blockquote:before,blockquote:after,q:before,q:after{content:'\0020'}
+textarea{overflow:auto}
+textarea,input{outline:0}
+mark{background-color:#ffc40d}
+ins,s,u,del{text-decoration:none;}
+// a{color:#000;text-decoration:none;cursor: pointer;}
+a{text-decoration:none;}
+body{margin:0 auto;height: 100%;overflow: hidden}
+*{box-sizing:border-box;}
+
+
+*:before, *:after {box-sizing:border-box;}
+
+/*android no highlight*/
+*{-webkit-tap-highlight-color: transparent;}
+
+/*font-family*/
+.font-light{font-family: "Roboto-light";};
+
+.font-regular{font-family: "Roboto-regular";};
+
+.font-american-blod{  font-family: "American-type-writer";};
+
+
+.clear{clear:both;height:0;line-height:0}
+.clear:after{content:".";height:0;line-height:0;visibility:hidden;clear:both}
+.clearfix:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+
+ ::-webkit-scrollbar
+{
+     width: 10px;
+    height: 10px;
+    /* background-color: #F5F5F5;   */
+    -webkit-tap-highlight-color: #3288D0;
+}
+
+/**
+ * 由于以下元素的部分属性没有继承父节点样式，所以声明这些元素的这些属性为父元素的属性。
+ * 取消这些元素的`outline`样式。
+ */
+
+ a,
+ h1,
+ h2,
+ h3,
+ h4,
+ h5,
+ h6,
+ p,
+ div,
+ input,
+ select,
+ button,
+ option,
+ textarea,
+ optgroup {
+     font-family: inherit;
+     font-size: inherit;
+     font-weight: inherit;
+     font-style: inherit;
+     line-height: 100%;
+     color: inherit;
+     outline: none;
+ }
+
+/*移除浏览器部分元素的默认边框*/
+
+img,
+abbr,
+input,
+button,
+acronym,
+fieldset,
+textarea {
+    border: none;
+}
+
+/*使如下元素默认鼠标经过是`小手`的形状（一般表示可以点击）*/
+
+button,
+input[type='submit'],
+input[type='button'] {
+    cursor: pointer;
+}
+
+input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
+    background-color:transparent !important;
+}
+
+
+/*取消火狐浏览器部分版本`input`聚焦的时候默认的`padding、border`*/
+
+input::-moz-focus-inner {
+    padding: 0;
+    border: 0;
+}
+
+
+/*取消部分浏览器`input[type='number']`的默认样式*/
+
+input[type='number'] {
+    -moz-appearance: textfield;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}
+
+
+/*输入控件的`placeholder`颜色设置为`#999`（浅灰色）*/
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+    color: #999;
+}
+
+
+
+/*由于部分浏览器`template`直接显示出来，所以要隐藏`template`元素*/
+
+template {
+    display: none;
+}

@@ -1,5 +1,5 @@
 # free-drawing
-
+A simple tablet project for free drawing
 ## Project setup
 ```
 yarn install
