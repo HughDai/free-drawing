@@ -25,7 +25,7 @@ const getPenWidth = function (e: KonvaEventObject<PointerEvent>, size: number): 
     case POINTER_TYPE.Mouse:
       return size
     case POINTER_TYPE.Pen:
-      return pressure * size
+      return Math.max(0.1, pressure) * 2 * size
     default:
       console.warn(`pointerType "${pointerType}" is Not suported`)
       return size
@@ -49,27 +49,22 @@ export default defineComponent({
           stroke: '#ff0000',
           lineCap: 'round',
           lineJoin: 'round',
-          bezier: true,
+          // bezier: true,
           // strokeWidth: 1,
           globalCompositeOperation: 'source-over',
-          widths: [getPenWidth(e, 1)],
+          widths: [getPenWidth(e, 2)],
           points: [pos.x, pos.y, pos.x, pos.y]
-          // sceneFunc: function(context) {
-          //   lineSceneFunc(context, this)
-          // }
         })
         layer.add(node)
-        layer.draw()
-        console.log('down', e)
+        // layer.draw()
       })
       stage.on('pointermove', (e: KonvaEventObject<PointerEvent>) => {
         if (!isDrawing) return
         e.evt.preventDefault()
         const pos = stage.getPointerPosition() as Vector2d
         node.points(node.points().concat([pos.x, pos.y]))
-        node.widths(node.widths().concat([getPenWidth(e, 1)]))
-        console.log(node)
-        layer.batchDraw()
+        node.widths(node.widths().concat([getPenWidth(e, 2)]))
+        // layer.batchDraw()
       })
       stage.on('pointerup', () => {
         isDrawing = false
@@ -86,6 +81,7 @@ export default defineComponent({
         name: 'penLayer'
       })
       stage.add(layer)
+      stage.container().style.cursor = 'url(' + cursors.pen + ') 0 0, move'
       bindStageEvents()
     })
   }

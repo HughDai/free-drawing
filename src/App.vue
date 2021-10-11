@@ -3,26 +3,25 @@
 </template>
 
 <script lang="ts">
-import { inject } from 'vue'
-import { Options, Vue } from 'vue-class-component'
+import { inject, defineComponent, onMounted } from 'vue'
 import Playground from './components/Playground.vue'
 
-@Options({
+export default defineComponent({
+  name: 'App',
   components: {
     Playground
+  },
+  setup () {
+    const $loading: any = inject('$loading')
+    $loading.show()
+    onMounted(() => {
+      // loading test
+      setTimeout(function () {
+        $loading.hide()
+      }, 1e3 * (Math.random() + 1))
+    })
   }
 })
-export default class App extends Vue {
-  loading: any = inject('$loading')
-
-  created () {
-    this.loading.show()
-  }
-
-  mounted () {
-    this.loading.hide()
-  }
-}
 </script>
 
 <style lang="scss">

@@ -24,13 +24,13 @@ const loading = {
 const install = function (app: any, options: LoadingOptions) {
   const instance = loading.create(options)
   instance.appContext = app._context
-  const { ctx } = instance.component as any
+  const { proxy } = instance.component as any
   const service = {
     show (tips: string) {
-      ctx.show(tips)
+      proxy.show(tips)
     },
     hide () {
-      ctx.hide()
+      proxy.hide()
     }
   }
   app.config.globalProperties.$loading = service

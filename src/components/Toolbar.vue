@@ -10,8 +10,8 @@
           :class="['icon', 'icon-' + mode, {'li-active': penMode === mode}]">
         </li>
       </ul>
-      <Slider :width="270" :default-size="size" @change="handleSliderChange"/>
-      <Sketch v-model="colors"/>
+      <Slider :width="270" v-model="size"/>
+      <ColorPicker v-model="colors"/>
     </div>
     <div class="pen-actions">
       <ul class="list-ul">
@@ -31,8 +31,8 @@
 
 <script lang="ts">
 import { defineComponent, reactive, toRefs, ref } from 'vue'
-import { Sketch } from '@ckpack/vue-color'
 import Slider from './Slider.vue'
+import ColorPicker from './ColorPicker.vue'
 import { PEN_MODE } from '../shared/constants'
 import { EnumUtils } from '../shared/utils'
 
@@ -40,13 +40,13 @@ export default defineComponent({
   name: 'Toolbar',
   components: {
     Slider,
-    Sketch
+    ColorPicker
   },
   setup () {
     const state = reactive({
+      size: 1,
       penMode: PEN_MODE.Pen,
-      colors: '#ff0000',
-      size: 1
+      colors: { brush: '#ff0000', layer: '#ffffff' }
     })
 
     const methods = {
@@ -175,6 +175,9 @@ $icons: (pen, eraser, redo, undo, clear, save);
 }
 .pen-actions {
   // background: #000;
+  .icon {
+    background-size: 24px;
+  }
 }
 .toolbar-header, .toolbar-footer {
   background: rgba($color: #fff, $alpha: .3);
@@ -199,9 +202,9 @@ $icons: (pen, eraser, redo, undo, clear, save);
   position: absolute;
   cursor: pointer;
   top: 10px;
-  left: -32px;
-  width: 32px;
+  left: -48px;
+  width: 42px;
   height: 32px;
-  background: #ccc url("~@/assets/images/transfer.png") center/20px no-repeat;
+  background: url("~@/assets/images/transfer.png") center/20px no-repeat;
 }
 </style>

@@ -1,1 +1,1 @@
-declare module '@ckpack/vue-color';
+declare module 'element-plus';

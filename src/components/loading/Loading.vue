@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div class="loading-mask" v-show="visible">
+    <div class="loading-mask" v-if="visible">
       <div class="loading-content">
         <Taichi :size="size" />
         <div class="loading-tips">{{ tips }}</div>

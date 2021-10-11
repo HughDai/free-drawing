@@ -5,9 +5,8 @@
     @mouseup="onMouseUp"
     @mouseleave="onMouseUp">
     <div class="indicator" :style="{'line-height': height + 'px'}">
-      Size: {{size}}
+      Size: {{modelValue}}
     </div>
-    <!-- <div class="main-bar"></div> -->
     <div class="track-bar" :style="trackStyle"></div>
   </div>
 </template>
@@ -24,7 +23,7 @@ export default defineComponent({
       type: Number,
       default: 1
     },
-    defaultSize: {
+    modelValue: {
       type: Number,
       default: 1
     },
@@ -37,7 +36,7 @@ export default defineComponent({
       default: 24
     }
   },
-  emits: ['change'],
+  emits: ['update:modelValue'],
   setup (props, { emit }) {
     const mainStyle = {
       width: props.width + 'px',
@@ -45,13 +44,9 @@ export default defineComponent({
     }
 
     let canMove = false
-    const defaultX = (props.defaultSize / MAX_SIZE) * props.width
+    const defaultX = (props.modelValue / MAX_SIZE) * props.width
     const trackSize = ref<number>(defaultX)
     const offsetX = ref<number>(defaultX)
-
-    const size = computed(() => {
-      return Math.ceil((trackSize.value / props.width) * MAX_SIZE)
-    })
 
     const trackStyle = computed(() => {
       return {
@@ -75,7 +70,6 @@ export default defineComponent({
       onMouseUp () {
         if (canMove) {
           canMove = false
-          emit('change', size.value)
         }
       }
     }
@@ -84,12 +78,13 @@ export default defineComponent({
       if (offsetX.value >= props.width) trackSize.value = props.width
       else if (offsetX.value <= 1) trackSize.value = 1
       else trackSize.value = offsetX.value
+      const size = Math.ceil((trackSize.value / props.width) * MAX_SIZE)
+      emit('update:modelValue', size)
     })
 
     return {
       mainStyle,
       trackStyle,
-      size,
       offsetX,
       trackSize,
       ...methods

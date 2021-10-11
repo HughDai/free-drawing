@@ -5,7 +5,7 @@ import { Factory } from 'konva/lib/Factory'
 import { GetSet } from 'konva/lib/types'
 import { _registerNode } from 'konva/lib/Global'
 
-Konva.pixelRatio = 1
+Konva.pixelRatio = window.devicePixelRatio
 window.Konva = Konva
 
 export interface CustomLineConfig extends LineConfig {
