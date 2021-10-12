@@ -5,7 +5,7 @@
     @mouseup="onMouseUp"
     @mouseleave="onMouseUp">
     <div class="indicator" :style="{'line-height': height + 'px'}">
-      Size: {{modelValue}}
+      {{text}}: {{modelValue}}
     </div>
     <div class="track-bar" :style="trackStyle"></div>
   </div>
@@ -14,8 +14,6 @@
 <script lang="ts">
 import { defineComponent, computed, watch, ref } from 'vue'
 
-const MAX_SIZE = 16
-
 export default defineComponent({
   name: 'Slider',
   props: {
@@ -23,9 +21,16 @@ export default defineComponent({
       type: Number,
       default: 1
     },
+    text: {
+      type: String
+    },
     modelValue: {
       type: Number,
       default: 1
+    },
+    maxSize: {
+      type: Number,
+      default: 100
     },
     width: {
       type: Number,
@@ -33,7 +38,7 @@ export default defineComponent({
     },
     height: {
       type: Number,
-      default: 24
+      default: 28
     }
   },
   emits: ['update:modelValue'],
@@ -44,7 +49,7 @@ export default defineComponent({
     }
 
     let canMove = false
-    const defaultX = (props.modelValue / MAX_SIZE) * props.width
+    const defaultX = (props.modelValue / props.maxSize) * props.width
     const trackSize = ref<number>(defaultX)
     const offsetX = ref<number>(defaultX)
 
@@ -78,7 +83,7 @@ export default defineComponent({
       if (offsetX.value >= props.width) trackSize.value = props.width
       else if (offsetX.value <= 1) trackSize.value = 1
       else trackSize.value = offsetX.value
-      const size = Math.ceil((trackSize.value / props.width) * MAX_SIZE)
+      const size = Math.ceil((trackSize.value / props.width) * props.maxSize)
       emit('update:modelValue', size)
     })
 
@@ -101,7 +106,9 @@ export default defineComponent({
   text-shadow: 0 0 5px rgb(255 255 255 / 50%);
   background: linear-gradient(to bottom,#909090 1%,#b3b3b3 73%);
   color: #333;
+  font-weight: 500;
   cursor: ew-resize;
+  margin-top: 16px;
   .indicator {
     position: absolute;
     text-align: left;

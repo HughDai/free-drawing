@@ -6,17 +6,18 @@
 
 <script lang="ts">
 import Konva, { CustomLine, CustomLineConfig, lineSceneFunc } from '../shared/konva'
-import { defineComponent, onMounted } from 'vue'
+import { defineComponent, onMounted, watch, ref } from 'vue'
 import { Stage } from 'konva/lib/Stage'
 import { Layer } from 'konva/lib/Layer'
 import { KonvaEventObject } from 'konva/lib/Node'
 import { Vector2d } from 'konva/lib/types'
 import { POINTER_TYPE } from '../shared/constants'
+import SVGOverlay from '../shared/svgOverlay'
 
-const cursors = {
-  pen: require('@/assets/images/cursor-pen.png'),
-  eraser: require('@/assets/images/cursor-eraser.png')
-}
+// const cursors = {
+//   pen: require('@/assets/images/cursor-pen.png'),
+//   eraser: require('@/assets/images/cursor-eraser.png')
+// }
 
 const getPenWidth = function (e: KonvaEventObject<PointerEvent>, size: number): number {
   const { pressure, pointerType } = e.evt
@@ -35,41 +36,59 @@ const getPenWidth = function (e: KonvaEventObject<PointerEvent>, size: number): 
 export default defineComponent({
   name: 'Stage',
   setup (props, context) {
-    let stage = {} as Stage
-    let layer = {} as Layer
-    let node = {} as CustomLine
+    let stage: Stage
+    let layer: Layer
+    let node: CustomLine
+    const currentPos = ref(null as Vector2d | null)
+    const overlay = new SVGOverlay({
+      width: document.body.clientWidth,
+      height: document.body.clientHeight
+    })
 
     const bindStageEvents = () => {
       let isDrawing = false
       stage.on('pointerdown', (e: KonvaEventObject<PointerEvent>) => {
         isDrawing = true
-        const pos = stage.getPointerPosition() as Vector2d
+        currentPos.value = stage.getPointerPosition() as Vector2d
+        const { x, y } = currentPos.value
         node = new CustomLine({
           name: 'line',
           stroke: '#ff0000',
           lineCap: 'round',
           lineJoin: 'round',
-          // bezier: true,
-          // strokeWidth: 1,
           globalCompositeOperation: 'source-over',
           widths: [getPenWidth(e, 2)],
-          points: [pos.x, pos.y, pos.x, pos.y]
+          points: [x, y, x, y]
         })
         layer.add(node)
-        // layer.draw()
       })
       stage.on('pointermove', (e: KonvaEventObject<PointerEvent>) => {
-        if (!isDrawing) return
         e.evt.preventDefault()
-        const pos = stage.getPointerPosition() as Vector2d
-        node.points(node.points().concat([pos.x, pos.y]))
+        currentPos.value = stage.getPointerPosition() as Vector2d
+        if (!isDrawing) return
+        const { x, y } = currentPos.value
+        node.points(node.points().concat([x, y]))
         node.widths(node.widths().concat([getPenWidth(e, 2)]))
-        // layer.batchDraw()
       })
       stage.on('pointerup', () => {
         isDrawing = false
       })
+      stage.on('mouseleave', () => {
+        console.log('mouseleave')
+        isDrawing = false
+        currentPos.value = null
+      })
     }
+
+    watch(currentPos,
+      (val: any) => {
+        overlay.updateCursor({
+          ...val,
+          radius: 4,
+          visible: val !== null
+        })
+      }
+    )
 
     onMounted(() => {
       stage = new Konva.Stage({
@@ -81,7 +100,8 @@ export default defineComponent({
         name: 'penLayer'
       })
       stage.add(layer)
-      stage.container().style.cursor = 'url(' + cursors.pen + ') 0 0, move'
+      stage.container().appendChild(overlay.getRootElement())
+      stage.container().style.cursor = 'crosshair'
       bindStageEvents()
     })
   }

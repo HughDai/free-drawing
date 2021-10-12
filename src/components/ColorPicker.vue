@@ -88,6 +88,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .color-picker-wrapper {
   display: flex;
+  height: 54px;
   .picker-item {
     flex: 1;
     display: flex;

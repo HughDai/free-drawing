@@ -32,6 +32,13 @@ export enum PEN_MODE {
   Eraser = 'eraser'
 }
 
+export enum BRUSH_MODE {
+  Circle = 'circle',
+  Chalk = 'chalk',
+  Calligraphy = 'calligraphy',
+  Square = 'square'
+}
+
 export enum OPERATION_TYPE {
   Add = 'add',
   Remove = 'remove',
