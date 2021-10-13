@@ -12,6 +12,11 @@ module.exports = {
     ecmaVersion: 2020
   },
   rules: {
+    'camelcase': 'off',
+    'no-empty-function': 'off',
+    'standard/no-callback-litera': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
+    'standard/no-callback-literal': 'off',
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
   },

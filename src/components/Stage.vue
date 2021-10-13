@@ -11,8 +11,9 @@ import { Stage } from 'konva/lib/Stage'
 import { Layer } from 'konva/lib/Layer'
 import { KonvaEventObject } from 'konva/lib/Node'
 import { Vector2d } from 'konva/lib/types'
-import { POINTER_TYPE } from '../shared/constants'
+import { POINTER_TYPE, BRUSH_MODE } from '../shared/constants'
 import SVGOverlay from '../shared/svgOverlay'
+import Brush from '../shared/brush'
 
 // const cursors = {
 //   pen: require('@/assets/images/cursor-pen.png'),
@@ -44,6 +45,7 @@ export default defineComponent({
       width: document.body.clientWidth,
       height: document.body.clientHeight
     })
+    let brush: any
 
     const bindStageEvents = () => {
       let isDrawing = false
@@ -51,27 +53,30 @@ export default defineComponent({
         isDrawing = true
         currentPos.value = stage.getPointerPosition() as Vector2d
         const { x, y } = currentPos.value
-        node = new CustomLine({
-          name: 'line',
-          stroke: '#ff0000',
-          lineCap: 'round',
-          lineJoin: 'round',
-          globalCompositeOperation: 'source-over',
-          widths: [getPenWidth(e, 2)],
-          points: [x, y, x, y]
-        })
-        layer.add(node)
+        // node = new CustomLine({
+        //   name: 'line',
+        //   stroke: '#ff0000',
+        //   lineCap: 'round',
+        //   lineJoin: 'round',
+        //   globalCompositeOperation: 'source-over',
+        //   widths: [getPenWidth(e, 2)],
+        //   points: [x, y, x, y]
+        // })
+        // layer.add(node)
+        brush.startLine(x, y, e.evt.pressure)
       })
       stage.on('pointermove', (e: KonvaEventObject<PointerEvent>) => {
         e.evt.preventDefault()
         currentPos.value = stage.getPointerPosition() as Vector2d
         if (!isDrawing) return
         const { x, y } = currentPos.value
-        node.points(node.points().concat([x, y]))
-        node.widths(node.widths().concat([getPenWidth(e, 2)]))
+        // node.points(node.points().concat([x, y]))
+        // node.widths(node.widths().concat([getPenWidth(e, 2)]))
+        brush.goLine(x, y, e.evt.pressure, false, false)
       })
       stage.on('pointerup', () => {
         isDrawing = false
+        brush.endLine()
       })
       stage.on('mouseleave', () => {
         console.log('mouseleave')
@@ -102,6 +107,13 @@ export default defineComponent({
       stage.add(layer)
       stage.container().appendChild(overlay.getRootElement())
       stage.container().style.cursor = 'crosshair'
+      brush = new Brush({
+        context: layer.getContext()._context,
+        mode: BRUSH_MODE.Circle,
+        size: 4,
+        opacity: 1,
+        color: '#ff0000'
+      })
       bindStageEvents()
     })
   }

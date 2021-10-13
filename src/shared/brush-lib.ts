@@ -5,7 +5,7 @@ export interface Segment extends Vector2d {
 }
 export interface Point extends Vector2d {
   spacing: number
-  dir:? Vector2d
+  dir?: Vector2d
 }
 
 export const clamp = function (val: number, min: number, max: number) {
@@ -71,10 +71,11 @@ export class PointLine {
   segments: Segment[]
   constructor (points: Vector2d[]) {
     // this.points = points
+    this.segments = []
     let length = 0
     for (let i = 0; i < points.length; i++) {
       if (i < points.length - 1) {
-        length = this.dist(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y)
+        length = dist(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y)
       }
       this.segments[i] = {
         x: points[i].x,
@@ -89,14 +90,14 @@ export class PointLine {
    * @returns {{x: number, y: number}}
    */
   getAtDist (dist: number): Vector2d {
-    let remainder = Math.min(_this.getLength(), dist)
+    let remainder = Math.min(this.getLength(), dist)
     let i = 0
 
     for (; remainder > this.segments[i].length && i < this.segments.length - 2; i++) {
       remainder -= this.segments[i].length
     }
 
-    let fac = Math.min(1, Math.max(0, remainder / this.segments[i].length))
+    const fac = Math.min(1, Math.max(0, remainder / this.segments[i].length))
 
     return {
       x: (this.segments[i].x * (1 - fac) + this.segments[i + 1].x * fac),
@@ -106,7 +107,7 @@ export class PointLine {
 
   getLength () {
     return this.segments.reduce((acc, curr) => {
-      return acc + curr
+      return acc + curr.length
     }, 0)
   }
 }
@@ -117,6 +118,7 @@ export class PointLine {
  */
 export class BezierLine {
   points: Point[]
+  lastDot: number
   lastPoint: Vector2d
   lastCallbackPoint: Vector2d
   lastAngle: number
@@ -145,12 +147,13 @@ export class BezierLine {
   ) {
     const curvePoints: Vector2d[] = []
     let t = 0
-    const result = {} as Vector2d
-    for (var i = 0; i <= resolution; i++) {
+    let result
+    for (let i = 0; i <= resolution; i++) {
       t = i / resolution
+      result = {} as Vector2d
       result.x = Math.pow(1 - t, 3) * p1.x + 3 * Math.pow(1 - t, 2) * t * p2.x + 3 * (1 - t) * Math.pow(t, 2) * p3.x + Math.pow(t, 3) * p4.x
       result.y = Math.pow(1 - t, 3) * p1.y + 3 * Math.pow(1 - t, 2) * t * p2.y + 3 * (1 - t) * Math.pow(t, 2) * p3.y + Math.pow(t, 3) * p4.y
-      curvePoints[curvePoints.length] = result
+      curvePoints[i] = result
     }
     return curvePoints
   }
@@ -173,6 +176,7 @@ export class BezierLine {
     callback: (arg: any) => void,
     controlsCallback: (arg: any) => void
   ) {
+    // console.log(x, y, this.points)
     if (this.lastPoint && x === this.lastPoint.x && y === this.lastPoint.y) {
       return
     }
@@ -197,37 +201,40 @@ export class BezierLine {
       }
     }
 
-    cosnt a = this.points[pointArr.length - 3]
-    const b = this.points[pointArr.length - 2]
+    const a = this.points[this.points.length - 3]
+    const b = this.points[this.points.length - 2]
     const p1 = a
-    const p2 = Vec2.add(a, Vec2.mul(a.dir, Vec2.dist(a, b) / 4))
-    const p3 = Vec2.sub(b, Vec2.mul(b.dir, Vec2.dist(a, b) / 4))
+    const p2 = Vec2.add(a, Vec2.mul(a.dir as Vector2d, Vec2.dist(a, b) / 4))
+    const p3 = Vec2.sub(b, Vec2.mul(b.dir as Vector2d, Vec2.dist(a, b) / 4))
     const p4 = b
 
-    const pointLine = callback
+    const pointLine = callback !== undefined
       ? new PointLine(this.getBezierPoints(p1, p2, p3, p4, 20))
       : new PointLine([p1, p4])
 
     const len = pointLine.getLength()
-    let tempSpacing = mix(this.lastSpacing, this.spacing, clamp(this.lastDot / len, 0, 1))
-    for (let d = this.lastDot; d <= len; d += tempSpacing) {
-      tempSpacing = mix(this.lastSpacing, this.spacing, clamp(d / len, 0, 1))
+    // console.log('this.points: ', this.points)
+    let tempSpacing = mix(this.lastSpacing, spacing, clamp(this.lastDot / len, 0, 1))
+    let d = this.lastDot
+    for (; d <= len; d += tempSpacing) {
+      tempSpacing = mix(this.lastSpacing, spacing, clamp(d / len, 0, 1))
       const point = pointLine.getAtDist(d)
-      const angle = this.lastCallbackPoint ? angleFromPoints(this.lastCallbackPoint, point) : undefined
-      if (callback) {
+      const angle = this.lastCallbackPoint ? angleFromPoints(this.lastCallbackPoint, point) : 0
+
+      if (callback !== undefined) {
         callback({
           x: point.x,
           y: point.y,
           t: d / len,
           angle: angle,
-          dAngle: lastCallbackPoint ? angle - this.lastAngle : 0
+          dAngle: this.lastCallbackPoint ? angle - this.lastAngle : 0
         })
       }
       this.lastCallbackPoint = point
       this.lastAngle = angle
     }
 
-    if (callback) {
+    if (callback !== undefined) {
       this.lastDot = d - len
     } else {
       this.lastDot = 0
@@ -237,7 +244,11 @@ export class BezierLine {
     this.lastSpacing = spacing
   }
 
-  addFinal (spacing: number, callback, controlsCallback) {
+  addFinal (
+    spacing: number,
+    callback: (arg: any) => void,
+    controlsCallback: (arg: any) => void
+  ) {
     const len = this.points.length
     if (len < 2) {
       return

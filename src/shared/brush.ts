@@ -28,11 +28,11 @@ export interface BrushConfig {
   color: string
 }
 
-export default class Brush () {
-  context: CanvasRenderingContext2D,
-  mode: BRUSH_MODE,
-  size: number,
-  opacity: number,
+export default class Brush {
+  context: CanvasRenderingContext2D
+  mode: BRUSH_MODE
+  size: number
+  opacity: number
   color: string
   spacing: number
   isDrawing: boolean
@@ -67,9 +67,10 @@ export default class Brush () {
       y: 0,
       pressure: 0
     }
-    this.bezierline: any = null
+    this.bezierline = null
 
     this.initAlphaCanvas()
+    this.updateAlphaCanvas()
   }
 
   initAlphaCanvas () {
@@ -87,24 +88,24 @@ export default class Brush () {
   }
 
   updateAlphaCanvas () {
-    if (this.mode === BRUSH_MODE.Circle || BRUSH_MODE.Square) {
+    if (this.mode === BRUSH_MODE.Circle || this.mode === BRUSH_MODE.Square) {
       return
     }
-    const instructionArr = [
+    const instructionArr: [HTMLCanvasElement, number][] = [
       [this.alphaCanvas128, 128],
       [this.alphaCanvas64, 64],
       [this.alphaCanvas32, 32]
     ]
-    let ctx: CanvasRenderingContext2D
+    let ctx: any
 
-    for (let index = 0; index < instructionArr.length; index++) {
+    for (let i = 0; i < instructionArr.length; i++) {
       ctx = instructionArr[i][0].getContext('2d')
 
       ctx.save()
       ctx.clearRect(0, 0, instructionArr[i][1], instructionArr[i][1])
 
       // ctx.fillStyle = "rgba(" + settingColor.r + ", " + settingColor.g + ", " + settingColor.b + ", " + alphaOpacityArr[settingAlphaId] + ")";
-      ctx.fillRect(0, 0, instructionArr[i][1], instructionArr[i][1]);
+      ctx.fillRect(0, 0, instructionArr[i][1], instructionArr[i][1])
 
       ctx.globalCompositeOperation = 'destination-in'
       ctx.imageSmoothingQuality = 'high'
@@ -115,12 +116,7 @@ export default class Brush () {
   }
 
   drawDot (
-    x: number,
-    y: number,
-    size: number,
-    opacity: number,
-    angle: number,
-    before: any
+    x: number, y: number, size: number, opacity: number, angle?: number, before?: number[]
   ) {
     if (size <= 0) {
       return
@@ -150,7 +146,6 @@ export default class Brush () {
         this.context.fillRect(-size, -size, size * 2, size * 2)
         this.context.restore()
       }
-
     } else {
       this.context.save()
       this.context.translate(x, y)
@@ -169,33 +164,32 @@ export default class Brush () {
     }
   }
 
-  continueLine (x: number, y: number, size: number, pressure: number) {
-    if (this.bezierLine === null) {
-      bezierLine = new BezierLine()
-      bezierLine.add(this.lastPressurePoint_1.x, this.lastPressurePoint_1.y, 0, function () {})
+  continueLine (x: number | null, y: number | null, size: number, pressure: number) {
+    if (this.bezierline === null) {
+      this.bezierline = new BezierLine()
+      this.bezierline.add(this.lastPressurePoint_1.x, this.lastPressurePoint_1.y, 0, function () {})
     }
-
-    let drawArr = []
-
-    function dotCallback (val: any) {
-      var localPressure = mix(lastInput2.pressure, pressure, val.t)
-      var localOpacity = this.opacity * (this.hasOpacityPressure ? (localPressure * localPressure) : 1)
-      var localSize = Math.max(0.1, this.size * (this.hasSizePressure ? localPressure : 1))
+    const drawArr: any[] = []
+    const dotCallback = (val: any) => {
+      const localPressure = mix(this.lastPressurePoint_2.pressure, pressure, val.t)
+      const localOpacity = this.opacity * (this.hasOpacityPressure ? (localPressure * localPressure) : 1)
+      const localSize = Math.max(0.1, this.size * (this.hasSizePressure ? localPressure : 1))
       drawArr.push([val.x, val.y, localSize, localOpacity, val.angle])
     }
 
-    var localSpacing = size * this.spacing
+    const localSpacing = size * this.spacing
     if (x === null) {
-      this.bezierLine.addFinal(localSpacing, dotCallback)
+      this.bezierline.addFinal(localSpacing, dotCallback)
     } else {
-      this.bezierLine.add(x, y, localSpacing, dotCallback)
+      this.bezierline.add(x, y, localSpacing, dotCallback)
     }
 
     this.context.save()
 
     let before
+    let item: any[]
     for (let i = 0; i < drawArr.length; i++) {
-      let item = drawArr[i]
+      item = drawArr[i]
       this.drawDot(item[0], item[1], item[2], item[3], item[4], before)
       before = item
     }
@@ -204,8 +198,8 @@ export default class Brush () {
 
   startLine (x: number, y: number, p: number) {
     p = clamp(p, 0, 1)
-    let localOpacity = this.hasOpacityPressure ? (this.opacity * p * p) : this.opacity
-    let localSize = this.hasSizePressure ? Math.max(0.1, p * this.size) : Math.max(0.1, this.size)
+    const localOpacity = this.hasOpacityPressure ? (this.opacity * p * p) : this.opacity
+    const localSize = this.hasSizePressure ? Math.max(0.1, p * this.size) : Math.max(0.1, this.size)
 
     this.isDrawing = true
     this.context.save()
@@ -224,8 +218,8 @@ export default class Brush () {
       return
     }
 
-    let pressure = clamp(p, 0, 1)
-    let localSize = thos.hasSizePressure ? Math.max(0.1, this.lastPressurePoint_1.pressure * this.size) : Math.max(0.1, this.size)
+    const pressure = clamp(p, 0, 1)
+    const localSize = this.hasSizePressure ? Math.max(0.1, this.lastPressurePoint_1.pressure * this.size) : Math.max(0.1, this.size)
 
     this.context.save()
     this.continueLine(x, y, localSize, this.lastPressurePoint_1.pressure)
@@ -238,13 +232,29 @@ export default class Brush () {
     this.lastPressurePoint_1.pressure = pressure
   }
 
-  endLine (x, y) {
+  endLine (x: number, y: number) {
     const localSize = this.hasSizePressure ? Math.max(0.1, this.lastPressurePoint_1.pressure * this.size) : Math.max(0.1, this.size)
     this.context.save()
     this.continueLine(null, null, localSize, this.lastPressurePoint_1.pressure)
     this.context.restore()
 
     this.isDrawing = false
-    this.bezierLine = null
+    this.bezierline = null
+  }
+
+  setColor (color: string) {
+    this.color = color
+  }
+
+  setOpacity (opacity: number) {
+    this.opacity = opacity
+  }
+
+  setSize (size: number) {
+    this.size = size
+  }
+
+  setMode (mode: BRUSH_MODE) {
+    this.mode = mode
   }
 }
