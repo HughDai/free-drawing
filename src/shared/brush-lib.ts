@@ -1,27 +1,18 @@
-import { Vector2d } from 'konva/lib/types'
+import { Segment, Point, Vector2d } from './types'
 
-export interface Segment extends Vector2d {
-  length: number
-}
-export interface Point extends Vector2d {
-  spacing: number
-  dir?: Vector2d
-}
-
-export const clamp = function (val: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, val))
-}
-
-export const mix = function (x: number, y: number, a: number) {
-  return x * (1 - a) + y * a
-}
-
-export const dist = function (ax: number, ay: number, bx: number, by: number) {
-  return Math.sqrt(Math.pow(ax - bx, 2) + Math.pow(ay - by, 2))
-}
-
-export const angleFromPoints = function (p1: Vector2d, p2: Vector2d) {
-  return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI
+export const Vec2Math = {
+  clamp: function (val: number, min: number, max: number) {
+    return Math.max(min, Math.min(max, val))
+  },
+  mix: function (x: number, y: number, a: number) {
+    return x * (1 - a) + y * a
+  },
+  dist: function (ax: number, ay: number, bx: number, by: number) {
+    return Math.sqrt(Math.pow(ax - bx, 2) + Math.pow(ay - by, 2))
+  },
+  angleFromPoints: function (p1: Vector2d, p2: Vector2d) {
+    return Math.atan2(p2.y - p1.y, p2.x - p1.x) * 180 / Math.PI
+  }
 }
 
 export const Vec2 = {
@@ -75,7 +66,7 @@ export class PointLine {
     let length = 0
     for (let i = 0; i < points.length; i++) {
       if (i < points.length - 1) {
-        length = dist(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y)
+        length = Vec2Math.dist(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y)
       }
       this.segments[i] = {
         x: points[i].x,
@@ -214,12 +205,12 @@ export class BezierLine {
 
     const len = pointLine.getLength()
     // console.log('this.points: ', this.points)
-    let tempSpacing = mix(this.lastSpacing, spacing, clamp(this.lastDot / len, 0, 1))
+    let tempSpacing = Vec2Math.mix(this.lastSpacing, spacing, Vec2Math.clamp(this.lastDot / len, 0, 1))
     let d = this.lastDot
     for (; d <= len; d += tempSpacing) {
-      tempSpacing = mix(this.lastSpacing, spacing, clamp(d / len, 0, 1))
+      tempSpacing = Vec2Math.mix(this.lastSpacing, spacing, Vec2Math.clamp(d / len, 0, 1))
       const point = pointLine.getAtDist(d)
-      const angle = this.lastCallbackPoint ? angleFromPoints(this.lastCallbackPoint, point) : 0
+      const angle = this.lastCallbackPoint ? Vec2Math.angleFromPoints(this.lastCallbackPoint, point) : 0
 
       if (callback !== undefined) {
         callback({

@@ -1,10 +1,15 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import store from '@/store'
+import { key, store } from '@/store'
+import mitt from 'mitt'
 import loading from '@/components/loading'
 import 'element-plus/dist/index.css'
 
-createApp(App)
-  .use(loading, { size: 'medium' })
-  .use(store)
-  .mount('#app')
+const mitter = mitt()
+
+const app = createApp(App)
+app.config.globalProperties.eventBus = mitter
+
+app.use(loading, { size: 'medium' })
+app.use(store, key)
+app.mount('#app')

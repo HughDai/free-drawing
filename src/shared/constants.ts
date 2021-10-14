@@ -44,3 +44,11 @@ export enum OPERATION_TYPE {
   Remove = 'remove',
   Update = 'update'
 }
+
+export const STAGE_CONFIG = {
+  size: 1,
+  opacity: 100,
+  penMode: PEN_MODE.Pen,
+  brushMode: BRUSH_MODE.Circle,
+  colors: { brush: 'rgba(255, 0, 0, 1)', layer: 'rgba(0, 34, 23, 1)' }
+}

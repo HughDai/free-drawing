@@ -47,11 +47,14 @@ export default defineComponent({
       // brushColor: brush,
       // layerColor: layer,
       layerPredefineColors: [
+        'rgba(0, 34, 23, 1)',
         '#000000',
         '#ffffff',
         'rgba(0, 0, 0, 0)'
       ],
       brushPredefineColors: [
+        '#000000',
+        '#ffffff',
         '#ff4500',
         '#ff8c00',
         '#ffd700',

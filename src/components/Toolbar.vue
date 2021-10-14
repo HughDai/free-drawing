@@ -1,5 +1,5 @@
 <template>
-  <div :class="['toolbar-wrapper', {'hidden': hidden}]">
+  <div :class="['toolbar-wrapper', {'hidden': !visible}]">
     <Header/>
     <div class="pen-actions">
       <ul class="list-panel">
@@ -12,13 +12,13 @@
     <div class="pen-options">
       <ul class="pen-mode list-panel">
         <li v-for="mode in penModes" :key="mode" :title="mode"
-          @click="handlePenModeChange(mode)"
+          @click="penMode = mode"
           :class="['icon', 'icon-' + mode, {'li-active': penMode === mode}]">
         </li>
       </ul>
       <ul class="brush-mode list-panel">
         <li v-for="mode in brushModes" :key="mode" :title="mode"
-          @click="handlePenModeChange(mode)"
+          @click="brushMode = mode"
           :class="['icon', 'icon-alpha_' + mode, {'li-active': brushMode === mode}]">
         </li>
       </ul>
@@ -29,19 +29,27 @@
     <div class="toolbar-footer">
       <Footer/>
     </div>
-    <div style="font-size: 24px;">UNFULFILL</div>
-    <div class="button-transfer" @click="handleVisible"></div>
+    <div class="button-transfer" @click="visible = !visible"></div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs, ref } from 'vue'
+import {
+  getCurrentInstance,
+  defineComponent,
+  reactive,
+  toRefs,
+  watch,
+  ref
+} from 'vue'
 import Slider from './Slider.vue'
 import Header from './Header.vue'
 import Footer from './Footer.vue'
 import ColorPicker from './ColorPicker.vue'
 import { PEN_MODE, BRUSH_MODE } from '../shared/constants'
 import { EnumUtils } from '../shared/utils'
+import { ElMessage } from 'element-plus'
+import { useStore, Mutations } from '@/store'
 
 export default defineComponent({
   name: 'Toolbar',
@@ -52,51 +60,53 @@ export default defineComponent({
     ColorPicker
   },
   setup () {
-    const state = reactive({
-      size: 1,
-      opacity: 100,
-      penMode: PEN_MODE.Pen,
-      brushMode: BRUSH_MODE.Circle,
-      colors: { brush: '#ff0000', layer: '#ffffff' }
-    })
+    const store = useStore()
+    const eventBus = getCurrentInstance()?.appContext.config.globalProperties.eventBus
+
+    const state = reactive(store.state.stageConfig)
 
     const methods = {
-      handleVisible () {
-        hidden.value = !hidden.value
-      },
       handleAction (action: string) {
         const method = actionHandlers[action]
         method && method.call(actionHandlers)
-      },
-      handlePenModeChange (mode: PEN_MODE) {
-        state.penMode = mode
-      },
-      handleBrushModeChange (mode: BRUSH_MODE) {
-        state.brushMode = mode
       }
     }
 
     const actionHandlers: { [key: string]: any } = {
       redo () {
         console.log('redo')
+        ElMessage({
+          message: 'TODO',
+          type: 'warning'
+        })
       },
       undo () {
         console.log('undo')
+        ElMessage({
+          message: 'TODO',
+          type: 'warning'
+        })
       },
       clear () {
-        console.log('clear')
+        eventBus.emit('command', 'clear')
       },
       save () {
-        console.log('save')
+        eventBus.emit('command', 'save')
       }
     }
 
-    const hidden = ref<boolean>(false)
+    const visible = ref<boolean>(true)
     const actions: Array<string> = ['redo', 'undo', 'clear', 'save']
     const penModes = EnumUtils.getEnumKeys(PEN_MODE, 'string')
     const brushModes = EnumUtils.getEnumKeys(BRUSH_MODE, 'string')
+
+    watch(state, (val: any) => {
+      eventBus.emit('stateChange', val)
+      store.commit(Mutations.SET_STAGE_CONFIG, val)
+    })
+
     return {
-      hidden,
+      visible,
       actions,
       penModes,
       brushModes,
@@ -211,6 +221,6 @@ $icons: (
   left: -48px;
   width: 42px;
   height: 32px;
-  background: url("~@/assets/images/transfer.png") center/20px no-repeat;
+  background: rgba($color: #fff, $alpha: .8) url("~@/assets/images/transfer.png") center/20px no-repeat;
 }
 </style>

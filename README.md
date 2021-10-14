@@ -1,29 +1,13 @@
 # free-drawing
 A simple tablet project for free drawing
-## Project setup
-```
-yarn install
-```
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
+##TODO
+1. undo redo
+2. smoothing line
+3. zindex
+4. pen buttons 32 detect eraser
+5. import export
+6. tojson
 
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Run your unit tests
-```
-yarn test:unit
-```
-
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## samples
+![sample](/docs/sample.jpg)
