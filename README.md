@@ -10,4 +10,4 @@ A simple tablet project for free drawing
 6. tojson
 
 ## samples
-![sample](/docs/sample.jpg)
+<img src="/docs/sample.jpg" width = "60%" />
