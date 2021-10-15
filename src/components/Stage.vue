@@ -50,13 +50,15 @@ export default defineComponent({
         //     return
         // }
         isDrawing = true
-        const { x, y, pressure } = e
+        const { x, y } = e
+        const pressure = state.penMode === PEN_MODE.Eraser ? 1 : e.pressure
         lastPos.value = { x, y }
         brush.startLine(x, y, pressure)
       })
       container.addEventListener('pointermove', (e: PointerEvent) => {
         e.preventDefault()
-        const { x, y, pressure } = e
+        const { x, y } = e
+        const pressure = state.penMode === PEN_MODE.Eraser ? 1 : e.pressure
         lastPos.value = { x, y }
         if (!isDrawing) return
         brush.goLine(x, y, pressure)
@@ -87,7 +89,6 @@ export default defineComponent({
       save () {
         canvas.toImage({
           callback (img) {
-            console.log(img)
             download(img.src, `free-drawing_${Date.now()}.png`)
           }
         })

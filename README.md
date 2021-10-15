@@ -10,4 +10,5 @@ A simple tablet project for free drawing
 6. tojson
 
 ## samples
-<img src="/docs/sample.jpg" width = "60%" />
+<img src="/docs/sample_0.jpg" width = "60%" />
+<img src="/docs/sample_1.jpg" width = "80%" />
