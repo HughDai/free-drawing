@@ -23,7 +23,7 @@
         </li>
       </ul>
       <ColorPicker v-model="colors" class="list-panel"/>
-      <Slider :width="250" text="Size" :max-size="36" v-model="size"/>
+      <Slider :width="250" text="Size" :max-size="100" v-model="size"/>
       <Slider :width="250" text="Opacity" :max-size="100" v-model="opacity"/>
     </div>
     <div class="toolbar-footer">

@@ -167,7 +167,6 @@ export class BezierLine {
     callback: (arg: any) => void,
     controlsCallback: (arg: any) => void
   ) {
-    // console.log(x, y, this.points)
     if (this.lastPoint && x === this.lastPoint.x && y === this.lastPoint.y) {
       return
     }

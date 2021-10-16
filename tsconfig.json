@@ -12,6 +12,7 @@
     "allowSyntheticDefaultImports": true,
     "strictPropertyInitialization": false,
     "suppressImplicitAnyIndexErrors": true,
+    "noImplicitThis": false,
     "sourceMap": true,
     "baseUrl": ".",
     "types": [

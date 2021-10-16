@@ -1,9 +1,20 @@
-
-import { BRUSH_MODE, PEN_MODE } from './constants'
 import { Vector2d } from './types'
+import { BRUSH_MODE, PEN_MODE } from './constants'
 import { BezierLine, Vec2Math } from './brush-lib'
+import Spline from './spline'
 
 const twoPI = Math.PI * 2
+
+const spacingPoints: [number, number][] = [
+  [0, 15],
+  [8, 7],
+  [14, 4],
+  [30, 3],
+  [50, 2.7],
+  [100, 2]
+]
+
+// const defaultSpacing = 0.8489
 
 const alphaImgs: {[key: string]: HTMLImageElement } = {
   [BRUSH_MODE.Chalk]: new Image(),
@@ -51,10 +62,8 @@ export default class Brush {
   constructor (config: BrushConfig) {
     this.context = config.context
     this.brushMode = config.brushMode
-    this.size = config.size
     this.opacity = config.opacity
     this.color = config.color
-    this.spacing = 0.8489
     this.isDrawing = false
     this.hasSizePressure = true
     this.hasOpacityPressure = false
@@ -70,7 +79,7 @@ export default class Brush {
       pressure: 0
     }
     this.bezierline = null
-
+    this.setSize(config.size)
     this.initAlphaCanvas()
   }
 
@@ -126,7 +135,6 @@ export default class Brush {
     if (size <= 0) {
       return
     }
-
     if (this.penMode === PEN_MODE.Eraser) {
       this.context.save()
       this.context.globalCompositeOperation = 'destination-out'
@@ -148,6 +156,8 @@ export default class Brush {
 
       if (!before && (this.brushMode === BRUSH_MODE.Circle || this.brushMode === BRUSH_MODE.Square)) {
         this.context.fillStyle = this.color
+        // this.context.fillStyle = '#' + ((Math.random() * 0xffffff) << 0).toString(16)
+        // this.context.strokeStyle = 'black'
       }
 
       if (this.brushMode === BRUSH_MODE.Circle) {
@@ -155,6 +165,7 @@ export default class Brush {
         this.context.arc(x, y, size, 0, twoPI)
         this.context.closePath()
         this.context.fill()
+        // this.context.stroke()
       } else if (this.brushMode === BRUSH_MODE.Square) {
         if (angle !== undefined) {
           this.context.save()
@@ -194,7 +205,6 @@ export default class Brush {
       const localSize = Math.max(0.1, this.size * (this.hasSizePressure ? localPressure : 1))
       drawArr.push([val.x, val.y, localSize, localOpacity, val.angle])
     }
-
     const localSpacing = size * this.spacing
     if (x === null) {
       this.bezierline.addFinal(localSpacing, dotCallback)
@@ -211,41 +221,40 @@ export default class Brush {
       this.drawDot(item[0], item[1], item[2], item[3], item[4], before)
       before = item
     }
+    // console.log(drawArr.length)
     this.context.restore()
   }
 
-  startLine (x: number, y: number, p: number) {
-    p = Vec2Math.clamp(p, 0, 1)
+  startLine (point: PressurePoint) {
+    const p = Vec2Math.clamp(point.pressure, 0, 1)
     const localOpacity = this.hasOpacityPressure ? (this.opacity * p * p) : this.opacity
     const localSize = this.hasSizePressure ? Math.max(0.1, p * this.size) : Math.max(0.1, this.size)
 
     this.isDrawing = true
     this.context.save()
-    this.drawDot(x, y, localSize, localOpacity)
+    this.drawDot(point.x, point.y, localSize, localOpacity)
     this.context.restore()
 
     this.lastDotSize = localSize * this.spacing
-    this.lastPressurePoint_1.x = x
-    this.lastPressurePoint_1.y = y
+    this.lastPressurePoint_1.x = point.x
+    this.lastPressurePoint_1.y = point.y
     this.lastPressurePoint_1.pressure = p
     this.lastPressurePoint_2.pressure = p
   }
 
-  goLine (x: number, y: number, p: number) {
+  goLine (point: PressurePoint) {
     if (!this.isDrawing) {
       return
     }
-
-    const pressure = Vec2Math.clamp(p, 0, 1)
+    const pressure = Vec2Math.clamp(point.pressure, 0, 1)
     const localSize = this.hasSizePressure ? Math.max(0.1, this.lastPressurePoint_1.pressure * this.size) : Math.max(0.1, this.size)
 
     this.context.save()
-    this.continueLine(x, y, localSize, this.lastPressurePoint_1.pressure)
-
+    this.continueLine(point.x, point.y, localSize, this.lastPressurePoint_1.pressure)
     this.context.restore()
 
-    this.lastPressurePoint_1.x = x
-    this.lastPressurePoint_1.y = y
+    this.lastPressurePoint_1.x = point.x
+    this.lastPressurePoint_1.y = point.y
     this.lastPressurePoint_2.pressure = this.lastPressurePoint_1.pressure
     this.lastPressurePoint_1.pressure = pressure
   }
@@ -260,19 +269,8 @@ export default class Brush {
     this.bezierline = null
   }
 
-  setConfig (config: {
-    brushMode: BRUSH_MODE,
-    penMode: PEN_MODE,
-    size: number,
-    opacity: number,
-    color: string
-  }) {
-    this.brushMode = config.brushMode
-    this.penMode = config.penMode
-    this.size = config.size
-    this.opacity = config.opacity
-    this.color = config.color
-    this.updateAlphaCanvas()
+  setContext (context: CanvasRenderingContext2D) {
+    this.context = context
   }
 
   setColor (color: string) {
@@ -285,9 +283,16 @@ export default class Brush {
 
   setSize (size: number) {
     this.size = size
+    const spline = new Spline(spacingPoints)
+    this.spacing = Math.max(2, spline.interpolate(size)) / 15
   }
 
-  setMode (mode: BRUSH_MODE) {
+  setBrushMode (mode: BRUSH_MODE) {
     this.brushMode = mode
+    this.updateAlphaCanvas()
+  }
+
+  setPenMode (mode: PEN_MODE) {
+    this.penMode = mode
   }
 }

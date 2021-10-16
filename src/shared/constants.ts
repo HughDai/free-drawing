@@ -46,7 +46,7 @@ export enum OPERATION_TYPE {
 }
 
 export const STAGE_CONFIG = {
-  size: 1,
+  size: 2,
   opacity: 100,
   penMode: PEN_MODE.Pen,
   brushMode: BRUSH_MODE.Circle,

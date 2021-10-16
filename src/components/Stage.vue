@@ -17,7 +17,7 @@ import { PEN_BUTTON, PEN_MODE } from '../shared/constants'
 import SVGOverlay from '../shared/svgOverlay'
 import Brush from '../shared/brush'
 import Canvas from '../shared/canvas'
-import { download } from '../shared/utils'
+import { throttle, download } from '../shared/utils'
 
 export default defineComponent({
   name: 'Stage',
@@ -39,21 +39,15 @@ export default defineComponent({
     const bindStageListeners = () => {
       let isDrawing = false
       container.addEventListener('pointerdown', (e: PointerEvent) => {
-        // switch (e.buttons) {
-        //   case PEN_BUTTON.Tip:
-        //     state.penMode = PEN_MODE.Pen
-        //     break
-        //   case PEN_BUTTON.Eraser:
-        //     state.penMode = PEN_MODE.Eraser
-        //     break
-        //   default:
-        //     return
-        // }
         isDrawing = true
         const { x, y } = e
         const pressure = state.penMode === PEN_MODE.Eraser ? 1 : e.pressure
         lastPos.value = { x, y }
-        brush.startLine(x, y, pressure)
+        brush.startLine({
+          x,
+          y,
+          pressure
+        })
       })
       container.addEventListener('pointermove', (e: PointerEvent) => {
         e.preventDefault()
@@ -61,7 +55,11 @@ export default defineComponent({
         const pressure = state.penMode === PEN_MODE.Eraser ? 1 : e.pressure
         lastPos.value = { x, y }
         if (!isDrawing) return
-        brush.goLine(x, y, pressure)
+        brush.goLine({
+          x,
+          y,
+          pressure
+        })
       })
       container.addEventListener('pointerup', () => {
         isDrawing = false
@@ -71,11 +69,14 @@ export default defineComponent({
         isDrawing = false
         lastPos.value = null
       })
+
+      window.addEventListener('resize', throttle(() => {
+        canvas.setSize(document.body.clientWidth, document.body.clientHeight)
+      }, 250))
     }
 
     const bindGlobalListeners = () => {
       eventBus.on('command', (command: string) => {
-        console.log(command)
         commandHandlers[command].call()
       })
     }
@@ -98,24 +99,14 @@ export default defineComponent({
     watch(lastPos, (val: any) => {
       overlay.updateCursor({
         ...val,
-        radius: state.size,
+        radius: state.size / 2,
         visible: val !== null
       })
     })
 
-    watch(
-      () => state,
+    watch(state,
       (val: any) => {
         store.commit(Mutations.SET_STAGE_CONFIG, val)
-        console.log(val)
-        brush.setConfig({
-          penMode: val.penMode,
-          brushMode: val.brushMode,
-          size: val.size,
-          opacity: val.opacity / 100,
-          color: val.colors.brush
-        })
-        console.log(brush)
       },
       { deep: true }
     )
@@ -123,10 +114,28 @@ export default defineComponent({
     watch(
       () => state.colors.layer,
       (val: any) => {
-        console.log(val)
         canvas.setBG(val)
       }
     )
+
+    watch(
+      () => state.colors.brush,
+      (val: any) => {
+        brush.setColor(val)
+      }
+    )
+
+    const props = ['size', 'opacity', 'penMode', 'brushMode']
+    props.forEach((prop: string) => {
+      watch(
+        () => state[prop],
+        (val: any) => {
+          if (prop === 'opacity') val = val / 100
+          const pascalProp = prop.replace(/\w/, (l: string) => l.toUpperCase())
+          brush['set' + pascalProp](val)
+        }
+      )
+    })
 
     onMounted(() => {
       container = document.getElementById('stage') as HTMLElement
