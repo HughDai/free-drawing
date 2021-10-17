@@ -3,7 +3,7 @@
     <div class="loading-mask" v-if="visible">
       <div class="loading-content">
         <Taichi :size="size" />
-        <div class="loading-tips">{{ tips }}</div>
+        <img src="../../assets/images/loading.png" :alt="tips">
       </div>
     </div>
   </transition>
@@ -57,6 +57,13 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
   z-index: 999;
+}
+.loading-content {
+  text-align: center;
+  img {
+    width: 120px;
+    margin-top: 12px;
+  }
 }
 .loading-tips {
   font-size: 18px;
