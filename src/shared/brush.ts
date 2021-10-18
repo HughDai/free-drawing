@@ -1,7 +1,7 @@
-import { Vector2d } from './types'
-import { BRUSH_MODE, PEN_MODE } from './constants'
-import { BezierLine, Vec2Math } from './brush-lib'
-import Spline from './spline'
+import { Vector2d } from '@/shared/types'
+import { BRUSH_MODE, PEN_MODE } from '@/shared/constants'
+import { BezierLine, Vec2Math } from '@/shared/brush-lib'
+import SplineInterpolator from '@/shared/spline-interpolator'
 
 const twoPI = Math.PI * 2
 
@@ -284,7 +284,7 @@ export default class Brush {
   setSize (size: number) {
     this.size = size / 2
     // this.spacing = 0.8489
-    const spline = new Spline(spacingPoints)
+    const spline = new SplineInterpolator(spacingPoints)
     this.spacing = Math.max(2, spline.interpolate(size)) / 15
     // console.log(this.spacing)
   }

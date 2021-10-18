@@ -1,8 +1,7 @@
 /**
- * from glfx.js by evanW:
- * from SplineInterpolator.cs in the Paint.NET source code
+ * http://scaledinnovation.com/analytics/splines/aboutSplines.html
  */
-export default class Spline {
+export default class SplineInterpolator {
   points: [number, number][]
   xa: number[]
   ya: number[]
