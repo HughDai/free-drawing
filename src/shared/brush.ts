@@ -282,9 +282,11 @@ export default class Brush {
   }
 
   setSize (size: number) {
-    this.size = size
+    this.size = size / 2
+    // this.spacing = 0.8489
     const spline = new Spline(spacingPoints)
     this.spacing = Math.max(2, spline.interpolate(size)) / 15
+    // console.log(this.spacing)
   }
 
   setBrushMode (mode: BRUSH_MODE) {

@@ -99,7 +99,8 @@ export default defineComponent({
     watch(lastPos, (val: any) => {
       overlay.updateCursor({
         ...val,
-        radius: state.size / 2,
+        radius: Math.max(1, state.size / 2),
+        color: state.colors.brush,
         visible: val !== null
       })
     })
@@ -145,7 +146,7 @@ export default defineComponent({
       })
       canvas.setBG(state.colors.layer)
       container.appendChild(overlay.getRootElement())
-      container.style.cursor = 'crosshair'
+      container.style.cursor = 'none'
       brush = new Brush({
         context: canvas.getContext(),
         penMode: state.penMode,

@@ -7,6 +7,7 @@ interface CursorPoint {
   x?: number,
   y?: number,
   radius?: number,
+  color?: string,
   visible?: boolean
 }
 
@@ -77,6 +78,11 @@ export default class SVGOverlay {
     if (point.y !== undefined) {
       this.cursorCircleOuter.setAttribute('cy', String(point.y))
       this.cursorCircleInner.setAttribute('cy', String(point.y))
+    }
+
+    if (point.color) {
+      this.cursorCircleOuter.setAttribute('stroke', point.color)
+      this.cursorCircleInner.setAttribute('stroke', point.color)
     }
 
     if (point.radius !== undefined) {
