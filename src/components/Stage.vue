@@ -13,17 +13,23 @@ import {
 } from 'vue'
 import { useStore, Mutations } from '@/store'
 import { Vector2d } from '../shared/types'
-import { PEN_BUTTON, PEN_MODE } from '../shared/constants'
+import { PEN_MODE, BRUSH_ACTION } from '../shared/constants'
 import SVGOverlay from '../shared/svgOverlay'
 import Brush from '../shared/brush'
 import Canvas from '../shared/canvas'
+import Timemachine from '../shared/timemachine'
 import { throttle, download } from '../shared/utils'
+import { ElMessage } from 'element-plus'
+import mockData from '../../mocks/free-drawing_1634577652361.json'
 
 export default defineComponent({
   name: 'Stage',
   setup () {
     const store = useStore()
     const eventBus = getCurrentInstance()?.appContext.config.globalProperties.eventBus
+
+    const timemachine = new Timemachine()
+    timemachine.makeHistory()
 
     const state = reactive(store.state.stageConfig)
 
@@ -38,33 +44,30 @@ export default defineComponent({
 
     const bindStageListeners = () => {
       let isDrawing = false
+
       container.addEventListener('pointerdown', (e: PointerEvent) => {
         isDrawing = true
         const { x, y } = e
         const pressure = state.penMode === PEN_MODE.Eraser ? 1 : e.pressure
         lastPos.value = { x, y }
-        brush.startLine({
-          x,
-          y,
-          pressure
-        })
+        brush.startLine({ x, y, pressure })
       })
+
       container.addEventListener('pointermove', (e: PointerEvent) => {
         e.preventDefault()
         const { x, y } = e
         const pressure = state.penMode === PEN_MODE.Eraser ? 1 : e.pressure
         lastPos.value = { x, y }
         if (!isDrawing) return
-        brush.goLine({
-          x,
-          y,
-          pressure
-        })
+        brush.goLine({ x, y, pressure })
       })
+
       container.addEventListener('pointerup', () => {
         isDrawing = false
         brush.endLine()
+        timemachine.add(brush.logger)
       })
+
       container.addEventListener('mouseleave', () => {
         isDrawing = false
         lastPos.value = null
@@ -86,6 +89,7 @@ export default defineComponent({
       undo () {},
       clear () {
         canvas.clear()
+        timemachine.reset()
       },
       save () {
         canvas.toImage({
@@ -93,7 +97,49 @@ export default defineComponent({
             download(img.src, `free-drawing_${Date.now()}.png`)
           }
         })
+      },
+      exportJSON () {
+        if (timemachine.size() === 0) {
+          return ElMessage({
+            message: 'no data',
+            type: 'warning'
+          })
+        }
+        const fullStack = timemachine.fullStack()
+        const json = JSON.stringify(fullStack)
+        const jsonBlob = new Blob([json])
+        download(jsonBlob, `free-drawing_${Date.now()}.json`)
       }
+    }
+
+    const redraw = function () {
+      // const fileReader = new FileReader()
+      // fileReader.onload = function (e) {
+      //   console.log(e.target)
+      // }
+      // fileReader.readAsText(new Blob(mockData))
+      console.log(mockData)
+      mockData.forEach(data => {
+        brush = new Brush({
+          context: canvas.getContext(),
+          ...data.config as any
+        })
+        data.actions.forEach((record) => {
+          if (record.p) {
+            const { x, y, p: pressure } = record.p
+            switch (record.a) {
+              case BRUSH_ACTION.startLine:
+                brush.startLine({ x, y, pressure })
+                break
+              case BRUSH_ACTION.goLine:
+                brush.goLine({ x, y, pressure })
+                break
+            }
+          } else {
+            brush.endLine()
+          }
+        })
+      })
     }
 
     watch(lastPos, (val: any) => {
@@ -157,6 +203,7 @@ export default defineComponent({
       })
       bindStageListeners()
       bindGlobalListeners()
+      redraw()
     })
   }
 })

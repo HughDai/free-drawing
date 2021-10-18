@@ -1,0 +1,66 @@
+$icons: (
+  pen, eraser, redo, undo, clear, save, import, export, info,
+  alpha_circle, alpha_chalk, alpha_calligraphy, alpha_square
+);
+
+@mixin hl {
+  background-color: rgba($color: #fff, $alpha: .8);
+}
+
+@mixin after_title {
+  position: absolute;
+  width: 60px;
+  // line-height: 24px;
+  font-size: 12px;
+  text-align: center;
+  left: 20px;
+  top: -10px;
+  padding: 5px;
+  background-color: #fff;
+  border-radius: 5px;
+  color: #333;
+  content: attr(title);
+  z-index: 10;
+}
+
+.icon {
+  background-size: 32px;
+  background-position: center;
+  background-repeat: no-repeat;
+  @each $icon in $icons {
+    &-#{$icon} {
+      background-image: url("~@/assets/images/#{$icon}.png");
+    }
+  }
+}
+
+.list-panel {
+  background-image: linear-gradient(to top, rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 0.6) 100%);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 10%), 0 1px #cecece;
+  display: flex;
+  margin-top: 16px;
+  li {
+    position: relative;
+    cursor: pointer;
+    float: left;
+    // width: 60px;
+    flex: 1;
+    height: 54px;
+    // border: 1px solid #cccccc;
+    &:hover {
+      @include hl;
+      &:after {
+        @include after_title;
+      }
+    }
+    & ~ li {
+      border-left: none;
+    }
+  }
+  .li-active {
+    @include hl;
+  }
+  .li-disabled {
+    opacity: .5;
+  }
+}

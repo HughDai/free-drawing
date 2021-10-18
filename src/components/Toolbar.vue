@@ -118,13 +118,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-$icons: (
-  pen, eraser, redo, undo, clear, save,
-  alpha_circle, alpha_chalk, alpha_calligraphy, alpha_square
-);
-@mixin hl {
-  background-color: rgba($color: #fff, $alpha: .8);
-}
 .toolbar-wrapper {
   width: 270px;
   position: absolute;
@@ -134,7 +127,7 @@ $icons: (
   user-select: none;
   touch-action: none;
   border-right: none;
-  background-color: #c5c5c5;
+  background-color: #c9c9c9;
   border-left: 1px solid #f3f3f3;
   transition: right .5s;
   z-index: 10;
@@ -142,53 +135,12 @@ $icons: (
 .hidden {
   right: -270px;
 }
-.list-panel {
-  background-image: linear-gradient(to top, rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 0.6) 100%);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 10%), 0 1px #cecece;
-  display: flex;
-  li {
-    position: relative;
-    cursor: pointer;
-    float: left;
-    // width: 60px;
-    flex: 1;
-    height: 54px;
-    // border: 1px solid #cccccc;
-    &:hover {
-      @include hl;
-      &:after {
-        position: absolute;
-        width: 60px;
-        // line-height: 24px;
-        font-size: 12px;
-        text-align: center;
-        left: 20px;
-        top: -10px;
-        padding: 5px;
-        background-color: #fff;
-        border-radius: 5px;
-        color: #333;
-        content: attr(title);
-        z-index: 10;
-      }
-    }
-    & ~ li {
-      border-left: none;
-    }
-  }
-  .li-active {
-    @include hl;
-  }
-  .li-disabled {
-    opacity: .5;
-  }
-}
 .pen-options {
   border-bottom: 1px solid #cccccc;
 }
-.pen-options, .pen-actions {
-  padding-bottom: 16px;
-}
+// .pen-options, .pen-actions {
+//   padding-bottom: 16px;
+// }
 .pen-actions {
   // background: #000;
   .icon {
@@ -203,16 +155,6 @@ $icons: (
   position: absolute;
   width: 100%;
   bottom: 0;
-}
-.icon {
-  background-size: 32px;
-  background-position: center;
-  background-repeat: no-repeat;
-  @each $icon in $icons {
-    &-#{$icon} {
-      background-image: url("~@/assets/images/#{$icon}.png");
-    }
-  }
 }
 .button-transfer {
   position: absolute;

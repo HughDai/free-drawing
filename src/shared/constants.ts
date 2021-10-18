@@ -45,6 +45,12 @@ export enum OPERATION_TYPE {
   Update = 'update'
 }
 
+export enum BRUSH_ACTION {
+  startLine = 's',
+  goLine = 'g',
+  endLine = 'e'
+}
+
 export const STAGE_CONFIG = {
   size: 2,
   opacity: 100,

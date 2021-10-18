@@ -71,6 +71,11 @@ export function throttle (fn: () => void, threshold: number) {
   }
 }
 
+export function toFixed (n: number, digits: number): number {
+  const fixedN = n.toFixed(digits)
+  return Number(fixedN)
+}
+
 export function createCanvasElement () {
   const canvas = document.createElement('canvas')
   // on some environments canvas.style is readonly

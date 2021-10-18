@@ -16,9 +16,9 @@ export default defineComponent({
     $loading.show()
     onMounted(() => {
       // loading test
-      setTimeout(function () {
+      window.onload = () => {
         $loading.hide()
-      }, 1e3 * (Math.random() + 1))
+      }
     })
   }
 })

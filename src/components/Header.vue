@@ -1,22 +1,53 @@
 <template>
   <div class="header-wrapper">
-    TODO HEADER
+    <div title="import" class="header-item icon icon-import"></div>
+    <div title="export" class="header-item icon icon-export" @click="exportJSON"></div>
+    <div title="info" class="header-item icon icon-info"></div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, getCurrentInstance } from 'vue'
 
 export default defineComponent({
-  name: 'Header'
+  name: 'Header',
+  setup () {
+    const eventBus = getCurrentInstance()?.appContext.config.globalProperties.eventBus
+
+    const exportJSON = function () {
+      eventBus.emit('command', 'exportJSON')
+    }
+
+    return {
+      exportJSON
+    }
+  }
 })
 </script>
 
 <style lang="scss" scoped>
+@import "../assets/styles/common.scss";
 .header-wrapper {
   background: rgba(255, 255, 255, 0.3);
-  height: 32px;
+  height: 44px;
   display: flex;
-  align-items: center;
+  .header-item {
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    &:hover {
+      background-color: rgba($color: #fff, $alpha: .5);
+      &:after {
+        @include after_title;
+        left: auto;
+        top: auto;
+        bottom: -20px;
+      }
+    }
+  }
+  .icon {
+    background-size: 24px;
+  }
 }
 </style>

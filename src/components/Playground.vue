@@ -19,7 +19,8 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+@import "../assets/styles/common.scss";
 .playground-container {
   position: absolute;
   width: 100%;

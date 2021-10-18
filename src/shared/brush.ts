@@ -1,7 +1,8 @@
-import { Vector2d } from '@/shared/types'
-import { BRUSH_MODE, PEN_MODE } from '@/shared/constants'
+import { PressurePoint, BrushConfig, BrushLog } from '@/shared/types'
+import { BRUSH_MODE, PEN_MODE, BRUSH_ACTION } from '@/shared/constants'
 import { BezierLine, Vec2Math } from '@/shared/brush-lib'
 import SplineInterpolator from '@/shared/spline-interpolator'
+import { toFixed } from './utils'
 
 const twoPI = Math.PI * 2
 
@@ -27,20 +28,8 @@ alphaImgs[BRUSH_MODE.Chalk].src = require('../assets/images/alpha_chalk.png')
 alphaImgs[BRUSH_MODE.Calligraphy].crossOrigin = 'Anonymous'
 alphaImgs[BRUSH_MODE.Calligraphy].src = require('../assets/images/alpha_calligraphy.png')
 
-export interface PressurePoint extends Vector2d {
-  pressure: number
-}
-
-export interface BrushConfig {
-  context: CanvasRenderingContext2D,
-  brushMode: BRUSH_MODE,
-  penMode: PEN_MODE,
-  size: number,
-  opacity: number,
-  color: string
-}
-
 export default class Brush {
+  logger: BrushLog
   context: CanvasRenderingContext2D
   brushMode: BRUSH_MODE
   penMode: PEN_MODE
@@ -62,6 +51,7 @@ export default class Brush {
   constructor (config: BrushConfig) {
     this.context = config.context
     this.brushMode = config.brushMode
+    this.penMode = config.penMode
     this.opacity = config.opacity
     this.color = config.color
     this.isDrawing = false
@@ -226,6 +216,25 @@ export default class Brush {
   }
 
   startLine (point: PressurePoint) {
+    Object.keys(point).forEach(key => {
+      point[key] = toFixed(point[key], 6)
+    })
+    this.logger = {
+      id: 'brush_' + Date.now(),
+      config: {
+        size: this.size,
+        color: this.color,
+        opacity: this.opacity,
+        penMode: this.penMode,
+        brushMode: this.brushMode
+      },
+      actions: [
+        {
+          p: { x: point.x, y: point.y, p: point.pressure },
+          a: BRUSH_ACTION.startLine
+        }
+      ]
+    }
     const p = Vec2Math.clamp(point.pressure, 0, 1)
     const localOpacity = this.hasOpacityPressure ? (this.opacity * p * p) : this.opacity
     const localSize = this.hasSizePressure ? Math.max(0.1, p * this.size) : Math.max(0.1, this.size)
@@ -246,11 +255,18 @@ export default class Brush {
     if (!this.isDrawing) {
       return
     }
+    Object.keys(point).forEach(key => {
+      point[key] = toFixed(point[key], 6)
+    })
     const pressure = Vec2Math.clamp(point.pressure, 0, 1)
     const localSize = this.hasSizePressure ? Math.max(0.1, this.lastPressurePoint_1.pressure * this.size) : Math.max(0.1, this.size)
 
     this.context.save()
     this.continueLine(point.x, point.y, localSize, this.lastPressurePoint_1.pressure)
+    this.logger.actions.push({
+      p: { x: point.x, y: point.y, p: point.pressure },
+      a: BRUSH_ACTION.goLine
+    })
     this.context.restore()
 
     this.lastPressurePoint_1.x = point.x
@@ -263,6 +279,9 @@ export default class Brush {
     const localSize = this.hasSizePressure ? Math.max(0.1, this.lastPressurePoint_1.pressure * this.size) : Math.max(0.1, this.size)
     this.context.save()
     this.continueLine(null, null, localSize, this.lastPressurePoint_1.pressure)
+    this.logger.actions.push({
+      a: BRUSH_ACTION.endLine
+    })
     this.context.restore()
 
     this.isDrawing = false
@@ -275,6 +294,7 @@ export default class Brush {
 
   setColor (color: string) {
     this.color = color
+    this.updateAlphaCanvas()
   }
 
   setOpacity (opacity: number) {
@@ -285,6 +305,7 @@ export default class Brush {
     this.size = size / 2
     // this.spacing = 0.8489
     const spline = new SplineInterpolator(spacingPoints)
+    // console.log(spline, spline.interpolate(size))
     this.spacing = Math.max(2, spline.interpolate(size)) / 15
     // console.log(this.spacing)
   }
