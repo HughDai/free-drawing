@@ -32,6 +32,9 @@ $icons: (
       background-image: url("~@/assets/images/#{$icon}.png");
     }
   }
+  &-disabled {
+    opacity: .3;
+  }
 }
 
 .list-panel {

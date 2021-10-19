@@ -130,3 +130,14 @@ export function download (src: any, filename: string) {
     link.remove()
   }, 100)
 }
+
+export function readTextFile (file: Blob): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      resolve(reader.result)
+    }
+    reader.onerror = reject
+    reader.readAsText(file)
+  })
+}

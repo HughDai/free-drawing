@@ -5,7 +5,14 @@
       <ul class="list-panel">
         <li v-for="action in actions" :key="action" :title="action"
           @click="handleAction(action)"
-          :class="['icon', 'icon-' + action]">
+          :class="[
+            'icon',
+            'icon-' + action,
+            {'icon-disabled': (!timemachine.canRedo() && action === 'redo')
+              || (!timemachine.canUndo() && action === 'undo')
+              || (!timemachine.size() && action === 'clear')
+            }
+          ]">
         </li>
       </ul>
     </div>
@@ -64,39 +71,16 @@ export default defineComponent({
     const eventBus = getCurrentInstance()?.appContext.config.globalProperties.eventBus
 
     const state = reactive(store.state.stageConfig)
+    const timemachine = store.state.timemachine
 
     const methods = {
       handleAction (action: string) {
-        const method = actionHandlers[action]
-        method && method.call(actionHandlers)
-      }
-    }
-
-    const actionHandlers: { [key: string]: any } = {
-      redo () {
-        console.log('redo')
-        ElMessage({
-          message: 'TODO',
-          type: 'warning'
-        })
-      },
-      undo () {
-        console.log('undo')
-        ElMessage({
-          message: 'TODO',
-          type: 'warning'
-        })
-      },
-      clear () {
-        eventBus.emit('command', 'clear')
-      },
-      save () {
-        eventBus.emit('command', 'save')
+        eventBus.emit('command', action)
       }
     }
 
     const visible = ref<boolean>(true)
-    const actions: Array<string> = ['redo', 'undo', 'clear', 'save']
+    const actions: Array<string> = ['undo', 'redo', 'clear', 'save']
     const penModes = EnumUtils.getEnumKeys(PEN_MODE, 'string')
     const brushModes = EnumUtils.getEnumKeys(BRUSH_MODE, 'string')
 
@@ -110,6 +94,7 @@ export default defineComponent({
       actions,
       penModes,
       brushModes,
+      timemachine,
       ...toRefs(state),
       ...methods
     }
@@ -127,7 +112,7 @@ export default defineComponent({
   user-select: none;
   touch-action: none;
   border-right: none;
-  background-color: #c9c9c9;
+  background-color: #e9e9eb;
   border-left: 1px solid #f3f3f3;
   transition: right .5s;
   z-index: 10;
@@ -136,15 +121,15 @@ export default defineComponent({
   right: -270px;
 }
 .pen-options {
-  border-bottom: 1px solid #cccccc;
+  // border-bottom: 1px solid #cccccc;
 }
 // .pen-options, .pen-actions {
 //   padding-bottom: 16px;
 // }
-.pen-actions {
+.pen-actions, .brush-mode {
   // background: #000;
   .icon {
-    background-size: 28px;
+    background-size: 24px;
   }
 }
 .slider-wrapper {

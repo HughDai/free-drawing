@@ -64,3 +64,5 @@ export interface BrushLog {
   config: BrushLogConfig,
   actions: ActionRecord[]
 }
+
+export type Nullable<T> = T | null

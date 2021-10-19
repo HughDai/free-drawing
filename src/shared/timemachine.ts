@@ -1,7 +1,5 @@
-import { BrushLog } from './types'
-
 export default class Timemachine {
-  stack: BrushLog[]
+  stack: any[]
   index: number
   historyIndex: number
 
@@ -33,12 +31,12 @@ export default class Timemachine {
     }
   }
 
-  add (log: BrushLog) {
-    if (!this.canRedo()) {
+  add (data: any) {
+    if (this.index !== this.size()) {
       this.stack.splice(this.index)
     }
 
-    this.stack.push(log)
+    this.stack.push(data)
     this.index++
   }
 
@@ -61,6 +59,10 @@ export default class Timemachine {
 
   fullStack () {
     return this.stack
+  }
+
+  currentStack () {
+    return this.stack.slice(0, this.index)
   }
 
   historyStack () {
@@ -86,11 +88,17 @@ export default class Timemachine {
   }
 
   canUndo () {
-    return this.index === this.historyIndex
+    return this.index !== this.historyIndex
   }
 
   canRedo () {
-    return this.index === this.size()
+    return this.index !== this.size()
+  }
+
+  setStack (stack: any[]) {
+    this.stack = stack
+    this.index = stack.length
+    this.makeHistory(0)
   }
 
   reset () {

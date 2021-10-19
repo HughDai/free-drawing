@@ -12,13 +12,13 @@ import {
   ref
 } from 'vue'
 import { useStore, Mutations } from '@/store'
-import { Vector2d } from '../shared/types'
+import { Vector2d, BrushConfig, BrushLog } from '../shared/types'
 import { PEN_MODE, BRUSH_ACTION } from '../shared/constants'
-import SVGOverlay from '../shared/svgOverlay'
+import SVGOverlay from '../shared/svg-overlay'
 import Brush from '../shared/brush'
 import Canvas from '../shared/canvas'
-import Timemachine from '../shared/timemachine'
-import { throttle, download } from '../shared/utils'
+// import Timemachine from '../shared/timemachine'
+import { throttle, download, readTextFile } from '../shared/utils'
 import { ElMessage } from 'element-plus'
 import mockData from '../../mocks/free-drawing_1634577652361.json'
 
@@ -28,8 +28,8 @@ export default defineComponent({
     const store = useStore()
     const eventBus = getCurrentInstance()?.appContext.config.globalProperties.eventBus
 
-    const timemachine = new Timemachine()
-    timemachine.makeHistory()
+    const timemachine = store.state.timemachine
+    timemachine.setStack(mockData)
 
     const state = reactive(store.state.stageConfig)
 
@@ -41,6 +41,18 @@ export default defineComponent({
       width: document.body.clientWidth,
       height: document.body.clientHeight
     })
+
+    const createBrush = (config?: BrushConfig) => {
+      config = config || {
+        context: canvas.getContext(),
+        penMode: state.penMode,
+        brushMode: state.brushMode,
+        size: state.size,
+        opacity: state.opacity / 100,
+        color: state.colors.brush
+      }
+      return new Brush(config)
+    }
 
     const bindStageListeners = () => {
       let isDrawing = false
@@ -74,28 +86,70 @@ export default defineComponent({
       })
 
       window.addEventListener('resize', throttle(() => {
-        canvas.setSize(document.body.clientWidth, document.body.clientHeight)
-      }, 250))
+        const width = document.body.clientWidth
+        const height = document.body.clientHeight
+        const canvasData = canvas.getContext().getImageData(0, 0, canvas.getWidth(), canvas.getHeight())
+        canvas.setSize(width, height)
+        overlay.setSize({ width, height })
+        canvas.getContext().putImageData(canvasData, 0, 0)
+      }, 400))
     }
 
     const bindGlobalListeners = () => {
-      eventBus.on('command', (command: string) => {
-        commandHandlers[command].call()
+      eventBus.on('command', (args: string | { command: string, payload: any }) => {
+        if (typeof args === 'string') {
+          commandHandlers[args].call()
+        } else {
+          commandHandlers[args.command].call(null, args.payload)
+        }
       })
     }
 
     const commandHandlers: { [key: string]: any } = {
-      redo () {},
-      undo () {},
+      redo () {
+        if (!timemachine.canRedo()) return
+        timemachine.redo()
+        redraw()
+      },
+      undo () {
+        if (!timemachine.canUndo()) return
+        timemachine.undo()
+        redraw()
+      },
       clear () {
+        if (timemachine.size() === 0) return
         canvas.clear()
         timemachine.reset()
       },
       save () {
+        if (timemachine.size() === 0) {
+          return ElMessage({
+            message: 'no data',
+            type: 'warning'
+          })
+        }
         canvas.toImage({
           callback (img) {
             download(img.src, `free-drawing_${Date.now()}.png`)
           }
+        })
+      },
+      importJSON (file: File) {
+        readTextFile(file).then(text => {
+          const list = JSON.parse(text)
+          if (!Array.isArray || list.length === 0) {
+            return ElMessage({
+              message: 'Warning, Invalid File.',
+              type: 'warning'
+            })
+          }
+          timemachine.setStack(list)
+          redraw()
+        }).catch(error => {
+          ElMessage({
+            message: 'Error, Import Error.' + error.message,
+            type: 'error'
+          })
         })
       },
       exportJSON () {
@@ -113,13 +167,9 @@ export default defineComponent({
     }
 
     const redraw = function () {
-      // const fileReader = new FileReader()
-      // fileReader.onload = function (e) {
-      //   console.log(e.target)
-      // }
-      // fileReader.readAsText(new Blob(mockData))
-      console.log(mockData)
-      mockData.forEach(data => {
+      canvas.clear()
+      const currentStack = timemachine.currentStack() as BrushLog[]
+      currentStack.forEach(data => {
         brush = new Brush({
           context: canvas.getContext(),
           ...data.config as any
@@ -140,6 +190,7 @@ export default defineComponent({
           }
         })
       })
+      brush = createBrush()
     }
 
     watch(lastPos, (val: any) => {
@@ -193,14 +244,7 @@ export default defineComponent({
       canvas.setBG(state.colors.layer)
       container.appendChild(overlay.getRootElement())
       container.style.cursor = 'none'
-      brush = new Brush({
-        context: canvas.getContext(),
-        penMode: state.penMode,
-        brushMode: state.brushMode,
-        size: state.size,
-        opacity: state.opacity / 100,
-        color: state.colors.brush
-      })
+      brush = createBrush()
       bindStageListeners()
       bindGlobalListeners()
       redraw()

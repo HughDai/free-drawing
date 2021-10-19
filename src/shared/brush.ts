@@ -2,7 +2,7 @@ import { PressurePoint, BrushConfig, BrushLog } from '@/shared/types'
 import { BRUSH_MODE, PEN_MODE, BRUSH_ACTION } from '@/shared/constants'
 import { BezierLine, Vec2Math } from '@/shared/brush-lib'
 import SplineInterpolator from '@/shared/spline-interpolator'
-import { toFixed } from './utils'
+import { toFixed } from '@/shared/utils'
 
 const twoPI = Math.PI * 2
 
@@ -222,7 +222,7 @@ export default class Brush {
     this.logger = {
       id: 'brush_' + Date.now(),
       config: {
-        size: this.size,
+        size: this.size * 2,
         color: this.color,
         opacity: this.opacity,
         penMode: this.penMode,

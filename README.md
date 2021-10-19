@@ -10,6 +10,7 @@ A simple tablet project for free drawing
 6. tojson
 7. add remove preview layer
 8. cooperation
+9. shortcut
 
 ## samples
 <img src="/docs/sample_2.png" width = "60%" />
