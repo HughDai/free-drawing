@@ -14,5 +14,3 @@ A simple tablet project for free drawing
 
 ## samples
 <img src="/docs/JohnHancock.png" />
-<img src="/docs/sample_2.png" width = "60%" />
-<img src="/docs/sample_0.jpg" width = "60%" />
