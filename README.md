@@ -13,6 +13,6 @@ A simple tablet project for free drawing
 9. shortcut
 
 ## samples
-<img src="/docs/sample_3.png" width = "60%" />
+<img src="/docs/JohnHancock.png" />
 <img src="/docs/sample_2.png" width = "60%" />
 <img src="/docs/sample_0.jpg" width = "60%" />

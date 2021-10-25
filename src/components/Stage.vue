@@ -20,7 +20,7 @@ import Canvas from '../shared/canvas'
 // import Timemachine from '../shared/timemachine'
 import { throttle, download, readTextFile } from '../shared/utils'
 import { ElMessage } from 'element-plus'
-import mockData from '../../mocks/free-drawing_1634577652361.json'
+const mockData = () => import(/* webpackChunkName: "mockdata" */ '../../mocks/free-drawing_1635136696045.json')
 
 export default defineComponent({
   name: 'Stage',
@@ -29,8 +29,6 @@ export default defineComponent({
     const eventBus = getCurrentInstance()?.appContext.config.globalProperties.eventBus
 
     const timemachine = store.state.timemachine
-    timemachine.setStack(mockData)
-
     const state = reactive(store.state.stageConfig)
 
     let container: HTMLElement
@@ -247,7 +245,10 @@ export default defineComponent({
       brush = createBrush()
       bindStageListeners()
       bindGlobalListeners()
-      redraw()
+      mockData().then(data => {
+        timemachine.setStack(data.default)
+        redraw()
+      })
     })
   }
 })

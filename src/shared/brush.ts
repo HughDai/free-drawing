@@ -69,8 +69,9 @@ export default class Brush {
       pressure: 0
     }
     this.bezierline = null
-    this.setSize(config.size)
+
     this.initAlphaCanvas()
+    this.setSize(config.size)
   }
 
   initAlphaCanvas () {
@@ -308,6 +309,7 @@ export default class Brush {
     // console.log(spline, spline.interpolate(size))
     this.spacing = Math.max(2, spline.interpolate(size)) / 15
     // console.log(this.spacing)
+    this.updateAlphaCanvas()
   }
 
   setBrushMode (mode: BRUSH_MODE) {
