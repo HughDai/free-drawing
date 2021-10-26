@@ -20,7 +20,7 @@ import Canvas from '../shared/canvas'
 // import Timemachine from '../shared/timemachine'
 import { throttle, download, readTextFile } from '../shared/utils'
 import { ElMessage } from 'element-plus'
-const mockData = () => import(/* webpackChunkName: "mockdata" */ '../../mocks/free-drawing_1635136696045.json')
+const mockData = () => import(/* webpackChunkName: "mockdata" */ '../../mocks/free-drawing_1635221844352.json')
 
 export default defineComponent({
   name: 'Stage',
