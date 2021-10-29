@@ -20,7 +20,8 @@ import Canvas from '../shared/canvas'
 // import Timemachine from '../shared/timemachine'
 import { throttle, download, readTextFile } from '../shared/utils'
 import { ElMessage } from 'element-plus'
-const mockData = () => import(/* webpackChunkName: "mockdata" */ '../../mocks/free-drawing_1635221844352.json')
+const mockDataEn = () => import(/* webpackChunkName: "mockdataEn" */ '../../mocks/free-drawing_1635221844352.json')
+const mockDataCn = () => import(/* webpackChunkName: "mockDataCn" */ '../../mocks/free-drawing_1635521643500.json')
 
 export default defineComponent({
   name: 'Stage',
@@ -245,6 +246,7 @@ export default defineComponent({
       brush = createBrush()
       bindStageListeners()
       bindGlobalListeners()
+      const mockData = Math.random() > 0.5 ? mockDataEn : mockDataCn
       mockData().then(data => {
         timemachine.setStack(data.default)
         redraw()

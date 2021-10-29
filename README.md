@@ -14,3 +14,4 @@ A simple tablet project for free drawing
 
 ## samples
 <img src="/docs/JohnHancock.png" />
+<img src="/docs/TENGWANGGEXU.png" />

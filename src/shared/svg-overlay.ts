@@ -53,7 +53,7 @@ export default class SVGOverlay {
 
   createCursorCircleInner () {
     this.cursorCircleInner = document.createElementNS(NamespaceURI, 'circle')
-    this.cursorCircleInner.setAttribute('r', '9')
+    this.cursorCircleInner.setAttribute('r', '5')
     this.cursorCircleInner.setAttribute('stroke', 'rgba(255,255,255,0.7)')
     this.cursorCircleInner.setAttribute('stroke-width', '1')
     this.cursorCircleInner.setAttribute('fill', 'none')
@@ -87,7 +87,7 @@ export default class SVGOverlay {
 
     if (point.radius !== undefined) {
       this.cursorCircleOuter.setAttribute('r', String(Math.max(0, point.radius)))
-      this.cursorCircleInner.setAttribute('r', String(Math.max(0, point.radius - 1)))
+      this.cursorCircleInner.setAttribute('r', String(Math.max(0, point.radius / 4)))
     }
 
     if (point.visible !== undefined) {
