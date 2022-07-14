@@ -12,8 +12,8 @@ export interface State {
 }
 
 export enum Mutations {
-  SET_STAGE_CONFIG = 'SET_STAGE_CONFIG'
-  // SET_TIMEMACHINE = 'SET_TIMEMACHINE'
+  SET_STAGE_CONFIG = 'SET_STAGE_CONFIG',
+  SET_TIMEMACHINE = 'SET_TIMEMACHINE'
 }
 
 export enum Actions {}
@@ -28,10 +28,10 @@ export const store = createStore({
   mutations: {
     [Mutations.SET_STAGE_CONFIG] (state, payload) {
       state.stageConfig = payload
+    },
+    [Mutations.SET_TIMEMACHINE] (state, payload) {
+      state.timemachine = payload
     }
-    // [Mutations.SET_TIMEMACHINE] (state, payload) {
-    //   state.timemachine = payload
-    // }
   },
   actions: {
   },

@@ -1,4 +1,4 @@
-import { createCanvasElement, urlToImage } from './utils'
+import { createCanvasElement, urlToImage } from '@/shared/utils'
 
 const DPR = window.devicePixelRatio
 

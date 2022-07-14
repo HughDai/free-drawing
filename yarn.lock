@@ -7096,11 +7096,6 @@ kleur@^3.0.3:
   resolved "https://registry.npm.taobao.org/kleur/download/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
   integrity sha1-p5yezIbuHOP6YgbRIWxQHxR/wH4=
 
-konva@^8.2.1:
-  version "8.2.1"
-  resolved "https://registry.npmmirror.com/konva/download/konva-8.2.1.tgz#e03c8a8ba79bcc5f4aff5f049f3a69400d54215d"
-  integrity sha1-4DyKi6ebzF9K/18EnzppQA1UIV0=
-
 launch-editor-middleware@^2.2.1:
   version "2.2.1"
   resolved "https://registry.nlark.com/launch-editor-middleware/download/launch-editor-middleware-2.2.1.tgz#e14b07e6c7154b0a4b86a0fd345784e45804c157"
@@ -10081,6 +10076,11 @@ static-extend@^0.1.1:
   dependencies:
     define-property "^0.2.5"
     object-copy "^0.1.0"
+
+stats.js@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.npm.taobao.org/stats.js/download/stats.js-0.17.0.tgz#b1c3dc46d94498b578b7fd3985b81ace7131cc7d"
+  integrity sha1-scPcRtlEmLV4t/05hbgaznExzH0=
 
 "statuses@>= 1.4.0 < 2", "statuses@>= 1.5.0 < 2", statuses@~1.5.0:
   version "1.5.0"

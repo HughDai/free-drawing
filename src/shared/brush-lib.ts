@@ -1,4 +1,4 @@
-import { Segment, Point, Vector2d } from './types'
+import { Segment, Point, Vector2d } from '@/shared/types'
 
 export const Vec2Math = {
   clamp: function (val: number, min: number, max: number) {

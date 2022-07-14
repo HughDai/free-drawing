@@ -20,8 +20,11 @@ import Canvas from '../shared/canvas'
 // import Timemachine from '../shared/timemachine'
 import { throttle, download, readTextFile } from '../shared/utils'
 import { ElMessage } from 'element-plus'
+
+// const Stats = require('stats.js')
+
 const mockDataEn = () => import(/* webpackChunkName: "mockdataEn" */ '../../mocks/free-drawing_1635221844352.json')
-const mockDataCn = () => import(/* webpackChunkName: "mockDataCn" */ '../../mocks/free-drawing_1635521643500.json')
+const mockDataCn = () => import(/* webpackChunkName: "mockdataCn" */ '../../mocks/free-drawing_1635521643500.json')
 
 export default defineComponent({
   name: 'Stage',
@@ -235,6 +238,8 @@ export default defineComponent({
     })
 
     onMounted(() => {
+      // document.body.appendChild(stats.dom)
+      // setStats()
       container = document.getElementById('stage') as HTMLElement
       canvas = new Canvas(container, {
         width: document.body.clientWidth,
